@@ -3,11 +3,13 @@ import type { FormEvent } from 'react';
 import type { Employee } from '../shared/employees.js';
 import { validateEmployeeName } from '../shared/employees.js';
 import { addEmployee, fetchEmployees } from './employee-api.js';
+import { TimeWorkspace } from './TimeWorkspace';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
 export function EmployeeWorkspace() {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedId, setSelectedId] = useState('');
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [attempt, setAttempt] = useState(0);
   const [name, setName] = useState('');
@@ -82,6 +84,7 @@ export function EmployeeWorkspace() {
   }
 
   const disabled = saving || loadState !== 'ready';
+  const selectedEmployee = employees.find(employee => employee.id === selectedId) ?? employees[0];
 
   return (
     <section className="employee-workspace" aria-label="Employee management">
@@ -111,13 +114,17 @@ export function EmployeeWorkspace() {
         )}
         {loadState === 'ready' && employees.length > 0 && (
           <ul className="employee-list" aria-label="Employees">
-            {employees.map(employee => (
-              <li key={employee.id}>
+            {employees.map((employee, index) => (
+              <li key={employee.id} className={selectedEmployee?.id === employee.id ? 'selected-employee' : ''}>
                 <span className="employee-avatar" aria-hidden="true">{Array.from(employee.name)[0]?.toLocaleUpperCase()}</span>
                 <div className="employee-details">
                   <h3>{employee.name}</h3>
-                  <p>Added <time dateTime={new Date(employee.createdAt).toISOString()}>{new Date(employee.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</time></p>
+                  <p>#{index + 1} · Added <time dateTime={new Date(employee.createdAt).toISOString()}>{new Date(employee.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</time></p>
                 </div>
+                <button className="secondary-button select-employee" type="button"
+                  aria-label={`Track time for ${employee.name}, employee ${index + 1}`}
+                  aria-pressed={selectedEmployee?.id === employee.id}
+                  onClick={() => setSelectedId(employee.id)}>Track time</button>
               </li>
             ))}
           </ul>
@@ -159,6 +166,7 @@ export function EmployeeWorkspace() {
         </form>
         <p className="form-note">Names can repeat. Each employee has their own record.</p>
       </aside>
+      {loadState === 'ready' && selectedEmployee && <TimeWorkspace key={selectedEmployee.id} employee={selectedEmployee} />}
     </section>
   );
 }

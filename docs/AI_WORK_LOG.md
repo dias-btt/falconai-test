@@ -76,6 +76,42 @@ No commits, pushes, PRs, or merges were performed by the assistant in this stage
 
 The application shell is runnable. Employee operations, timer operations, reporting, browser automation, and a process-level active-timer restart test remain in their planned stages. Passing schema tests does not prove those unimplemented user journeys.
 
+## 2026-11-02 — Step 3: employee management
+
+Actual request: “next step”. Continued the agreed plan on `feat/employees`, adding create/list API routes, a form and employee list, shared Unicode-aware name validation, and an optional repeatable fictional seed command. No dependencies or schema changes were needed. All 40 tests, lint, type checking, and build passed.
+
+Browser verification used a temporary database: empty state, blank-name validation, creation, reload persistence, failed-save draft retention, failed-load recovery, and a real API restart all worked. Checked mobile (390px) and desktop (1280px) layouts without horizontal overflow. Running the seed twice added 3 then 0 records. No new application bug was found in this stage. The user committed and merged it in [PR #2](https://github.com/dias-btt/falconai-test/pull/2), commit `82cb4c1`.
+
+## 2026-11-02 — Steps 4 and 5: timers and reports together
+
+### Actual request
+
+> do steps 4 and 5 together. tokens are limited, so make sure you dont waste them on unnecessary checks
+
+The workspace was clean on the user-created `feat/reports` branch, based on merged employee PR #2. Combined timers and reports in one delivery and kept verification focused.
+
+### Implementation decisions
+
+- Added server-timestamped start/stop operations. A conditional insert and the existing unique index prevent simultaneous active timers per employee. Repeated stops preserve the recorded end time; a new start creates a distinct history entry.
+- Active entries remain in SQLite across application restarts. The UI recovers server state and derives elapsed display time from the returned server timestamp plus a monotonic browser clock.
+- Added employee selection, a task form, running timer display, and completed records with total time for inclusive local calendar dates. Running entries are excluded from reports and displayed separately.
+- Report API uses UTC millisecond bounds `[from, to)`, clips each completed entry to their intersection, and sums milliseconds before formatting. Calendar arithmetic handles daylight-saving changes, and totals do not wrap after 24 hours.
+- Failed timer writes require a refresh before another action; they are not automatically retried. Report responses from an obsolete employee/date selection are ignored.
+- No new dependencies or database migrations were needed.
+
+### Checks and corrections
+
+- First lint run caught a line break between a parameterized test definition and its call. Corrected the formatting.
+- All **63 tests across 7 files passed**, including start–stop–start, concurrent starts, repeated stops, clock rollback, invalid inputs, employee isolation, empty reports, overlap at both period edges, and 23/25-hour calendar days.
+- A real child-process test created an employee, stopped one timer, left another running, terminated the API, restarted it against the same temporary SQLite file, verified the original active entry, then stopped it and checked the report total.
+- Type checking caught the restart test helper returning untyped JSON. Added explicit response types; `npm run build` then passed. Runtime tests had already passed; the correction only added types, so they were not rerun unnecessarily.
+- The compiled server started successfully with the isolated fictional dataset. The attempted final browser smoke check was blocked by the browser integration connection error. No claim is made that the new timer/report UI received browser verification; that remains part of acceptance hardening.
+- No new application defect was found; the above corrections were in test code. The earlier oversized-request defect and its regression test remain documented in the foundation entry.
+
+### Handoff
+
+README now documents employee setup/seeding, timers, report rules, and API endpoints. Model identity remains unverified. Existing development-only dependency findings were not re-audited because dependencies did not change. No commits, pushes, or PRs were created by the assistant for this combined stage; remote CI has not run for these changes. Steps 6 and 7 remain: browser acceptance hardening and submission polish.
+
 ## Future entry format
 
 For each stage, record:
