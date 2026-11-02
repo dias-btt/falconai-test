@@ -2,30 +2,30 @@
 * { box-sizing: border-box; }
 body { margin: 0; }
 button, a { -webkit-tap-highlight-color: transparent; }
-a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #267365; outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, .table-scroll:focus-visible { outline: 3px solid #267365; outline-offset: 3px; }
 .app-shell { max-width: 1180px; margin: 0 auto; padding: 0 48px; }
 .header { display: flex; align-items: center; justify-content: space-between; padding: 30px 0; border-bottom: 1px solid #d9ded5; }
 .brand { display: inline-flex; gap: 11px; align-items: center; font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -1px; text-decoration: none; color: inherit; }
 .brand-mark { display: grid; place-items: center; width: 35px; height: 35px; background: #214e40; color: #e3edbf; border-radius: 10px; font-size: 24px; }
 .header-label, .eyebrow, .section-number { font-size: 11px; letter-spacing: 1.8px; font-weight: 700; }
-.header-label { color: #65776e; }
+.header-label { color: #52634f; }
 main { padding: 68px 0 60px; }
-.eyebrow { margin: 0 0 19px; color: #65776e; }
+.eyebrow { margin: 0 0 19px; color: #52634f; }
 h1 { font-family: 'Manrope', sans-serif; font-size: clamp(40px, 6vw, 64px); line-height: 1.13; letter-spacing: -3px; font-weight: 500; margin: 0; }
 h1 span { color: #66816b; }
-.intro { font-size: 17px; line-height: 1.7; color: #64736a; max-width: 520px; margin: 20px 0 38px; }
+.intro { font-size: 17px; line-height: 1.7; color: #52634f; max-width: 520px; margin: 20px 0 38px; }
 .workspace-card { background: #fffefa; border: 1px solid #dce1d4; border-radius: 18px; padding: 30px 34px; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.section-number { color: #768373; }
+.section-number { color: #52634f; }
 .stage-label { background: #edf0e3; color: #5a6a50; padding: 6px 10px; border-radius: 6px; font-size: 12px; }
 h2 { font-family: 'Manrope', sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.8px; margin: 30px 0 10px; }
-.workspace-card > p { color: #64736a; line-height: 1.65; max-width: 560px; margin-bottom: 28px; }
+.workspace-card > p { color: #52634f; line-height: 1.65; max-width: 560px; margin-bottom: 28px; }
 h3 { font-weight: 500; font-size: 15px; margin: 10px 0 6px; }
 .employee-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 24px; align-items: start; }
 .employee-workspace h2 { margin-top: 22px; }
 .employee-workspace .card-description { font-size: 14px; margin: 0 0 28px; }
 .team-card { min-height: 385px; }
-.list-message, .empty-team { padding: 28px 0; border-top: 1px solid #e6e8df; color: #64736a; line-height: 1.6; }
+.list-message, .empty-team { padding: 28px 0; border-top: 1px solid #e6e8df; color: #52634f; line-height: 1.6; }
 .empty-team { text-align: center; padding-top: 34px; }
 .empty-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: #edf0e3; color: #4c7055; font-size: 26px; }
 .empty-team h3 { color: #183d35; font-size: 16px; font-weight: 600; margin-top: 18px; }
@@ -35,7 +35,7 @@ h3 { font-weight: 500; font-size: 15px; margin: 10px 0 6px; }
 .employee-avatar { flex: 0 0 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #e9eedf; color: #43664c; font-size: 17px; font-weight: 600; }
 .employee-details { min-width: 0; }
 .employee-details h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
-.employee-details p { margin: 0; color: #64736a; font-size: 12px; }
+.employee-details p { margin: 0; color: #52634f; font-size: 12px; }
 .add-card { background: #eef0e7; padding: 30px 26px; }
 .add-card h2 { font-size: 23px; }
 label { display: block; margin-bottom: 9px; font-size: 13px; font-weight: 600; }
@@ -53,10 +53,11 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 .form-success { color: #245738; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .form-success:empty { display: none; }
 .form-note { border-top: 1px solid #d8dece; padding-top: 18px; margin: 24px 0 0 !important; font-size: 12px; }
-.coming-next { font-size: 13px; color: #64736a; margin-top: 24px; }
-footer { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; border-top: 1px solid #d9ded5; color: #738075; font-size: 12px; }
+.coming-next { font-size: 13px; color: #52634f; margin-top: 24px; }
+footer { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; border-top: 1px solid #d9ded5; color: #52634f; font-size: 12px; }
 .select-employee { margin-left: auto; flex-shrink: 0; font-size: 12px; padding: 8px 10px; }
 .select-employee[aria-pressed='true'] { background: #214e40; color: #fffefa; }
+.select-employee[aria-pressed='true']:hover:not(:disabled) { background: #153c30; }
 .time-workspace { grid-column: 1 / -1; min-width: 0; }
 .time-workspace > h2 { overflow-wrap: anywhere; }
 .timer-form { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 28px; margin: 26px 0 12px; }
@@ -65,13 +66,13 @@ textarea { width: 100%; resize: vertical; border: 1px solid #bfcbbb; border-radi
 .running-note { color: #245738; font-size: 13px; }
 .report-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; border-top: 1px solid #d8dece; margin-top: 28px; padding-top: 22px; }
 .report-heading h3 { font-size: 22px; margin: 0; font-weight: 600; }
-.report-heading span { color: #64736a; font-size: 12px; }
+.report-heading span { color: #52634f; font-size: 12px; }
 .report-filters { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
 .report-filters > div { flex: 1; min-width: 150px; }
 .report-filters input { min-width: 0; }
 .report-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #eef0e7; padding: 20px; border-radius: 10px; margin-top: 22px; }
 .report-total strong { font-size: 26px; font-variant-numeric: tabular-nums; }
-.empty-report { text-align: center; color: #64736a; padding: 26px 0; }
+.empty-report { text-align: center; color: #52634f; padding: 26px 0; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
 th, td { border-bottom: 1px solid #e6e8df; padding: 14px 10px; vertical-align: top; }

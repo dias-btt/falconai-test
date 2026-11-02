@@ -1,11 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "DOM"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["tests", "vite.config.ts", "vitest.config.ts"]
+  "include": ["tests", "vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
 }

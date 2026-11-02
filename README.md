@@ -1,28 +1,12 @@
 # ShiftLedger
 
-A small employee time tracker for the Falcon AI programmer assignment.
+A small employee time tracker built for the Falcon AI programmer assignment using **OpenAI Codex and GPT-6 Astra**. Add fictional employees, track tasks, and review completed time for any date range. No accounts or external services are required.
 
-**Status:** employees, task timers, and date-range reports are implemented. SQLite persists employees, completed entries, and active timers across server restarts. Automated acceptance hardening and final submission polish remain.
+![ShiftLedger employee timer and report](docs/screenshots/desktop.png)
 
-## Scope
+## Run
 
-- Add employees using fictional names.
-- Start and stop a timer with a task description, with one active timer per employee.
-- View each employee's records and total time for a selected period.
-- Retain employees, completed entries, and running timers after application restarts.
-- Provide a simple interface without authentication or roles.
-
-## Implementation
-
-TypeScript throughout, with a React/Vite interface, an Express HTTP API, and SQLite persistence using Node's built-in `node:sqlite` module. Vitest and Supertest cover the foundation with real SQLite databases and HTTP requests. Playwright browser automation will be added with the feature acceptance work. Direct dependencies and the resolved dependency tree are pinned in `package.json` and `package-lock.json`.
-
-The server owns timestamps and validation. SQLite stores durable state; the browser renders elapsed time from the server's start timestamp. Reports count completed entries and clip their duration to the requested period. Running timers appear separately.
-
-See [the implementation plan](docs/IMPLEMENTATION_PLAN.md) for decisions, acceptance criteria, and the branch sequence.
-
-## Run locally
-
-Requires **Node.js 24.2 or newer within the 24.x series** and **npm 11.x**. `.nvmrc` selects the locally tested minimum, 24.2.0. If you use nvm, run `nvm install` and `nvm use` first. Node 24.2 emits an experimental warning for `node:sqlite`; no experimental flag or database service is required.
+Requires **Node.js 24.2+ within the 24.x series** and **npm 11.x**. With nvm, run `nvm install` and `nvm use` to select `.nvmrc`.
 
 ```bash
 git clone https://github.com/dias-btt/falconai-test.git
@@ -31,93 +15,122 @@ npm ci
 npm run dev
 ```
 
-Open [the development app](http://127.0.0.1:5173). Vite proxies `/api` to the Node server at port 3001. Both processes restart or refresh when their source changes; Ctrl+C stops both. Add an employee, select **Track time**, enter a task description, and start the timer. Stop it to include its time in the report below.
+Open [the app](http://127.0.0.1:5173). Add an employee, choose **Track time**, enter a task, and press **Start timer**. Stop the timer to include it in the report. Select inclusive **From** and **Through** dates and press **View report**.
 
-The server creates `data/shiftledger.sqlite` and applies pending migrations automatically at startup. Restarting uses the same file without clearing data. No separate initialization command is needed. Optionally run `npm run db:seed` to add three fictional employees; repeated runs preserve existing records and do not duplicate the samples.
+The server automatically creates `data/shiftledger.sqlite` and applies migrations. Data survives page reloads, server restarts, and rebuilds. Optional fictional examples:
 
-### Configuration
+```bash
+npm run db:seed
+```
 
-No `.env` file is needed for the defaults. To customize them, copy `.env.example` to `.env` and edit it. Restart the development command after changing configuration.
+This adds Alex Example, Sam Sample, and Jordan Demo. Repeating it does not duplicate samples or change existing records. No real employee data is included in the repository.
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `HOST` | `127.0.0.1` | API/production bind address |
-| `PORT` | `3001` | API/production port; the Vite proxy reads this too |
-| `DATABASE_PATH` | `./data/shiftledger.sqlite` | Persistent SQLite path, relative to the working directory or absolute |
+### Production
 
-Use the default host for local development; the Vite proxy connects through `127.0.0.1`. The app has no authentication and is intended for this local assignment. Use only fictional data.
-
-### Production build
-
-Stop the development servers first, then run:
+Stop development first, then:
 
 ```bash
 npm run build
 npm start
 ```
 
-Open [the production app](http://127.0.0.1:3001). One Node process serves the compiled client and API; Vite is not needed at runtime. Keep `dist/`, `package.json`, production `node_modules`, and the persistent database together in your deployment directory. The database path is independent of build output; rebuilding does not delete it.
+Open [the production app](http://127.0.0.1:3001). One Node process serves the built React client and API. Retain `dist/`, `package.json`, production dependencies, and the database. Do not store the database inside `dist/`.
 
-### Checks
+### Configuration
+
+Defaults work without an environment file. Copy `.env.example` to `.env` to customize them, then restart the app.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `HOST` | `127.0.0.1` | API/production bind address |
+| `PORT` | `3001` | API/production port; Vite's proxy reads it too |
+| `DATABASE_PATH` | `./data/shiftledger.sqlite` | Absolute path or path relative to the working directory |
+
+Use the default host for local development. The app intentionally has no authentication; use fictional data and local access. Node 24.2 emits an experimental warning for its built-in SQLite module; no flag or separate database installation is needed.
+
+## Verification
 
 ```bash
-npm run check
+npx playwright install chromium
+npm run verify
 ```
 
-This runs lint, all tests, type checking, and the production build. Individual commands are `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:watch`, and `npm run build`.
+On Linux, use `npx playwright install --with-deps chromium` if browser system libraries are missing. `verify` runs lint, type checking, API/database tests, the production build, and browser acceptance tests. Browsers are needed only for acceptance tests, not to run the app.
 
-The 63 tests cover employee validation and persistence, repeatable seeding, timer start–stop–start, concurrent starts, idempotent stops, real API-process restart recovery, empty reports, clipped date boundaries, daylight-saving changes, configuration, and HTTP errors. Tests use temporary databases and do not modify your local data.
+| Command | Purpose |
+| --- | --- |
+| `npm run check` | Lint, unit/integration tests, type checking, build |
+| `npm test` | Unit and API/database tests |
+| `npm run test:watch` | Watch those tests during development |
+| `npm run test:e2e` | Browser tests against the existing production build |
+| `npm run build` | Type check and compile client/server |
+| `npm run lint` / `npm run typecheck` | Individual static checks |
 
-[GitHub Actions](.github/workflows/ci.yml) runs `npm ci` and `npm run check` for PRs and pushes to `main`, on the minimum and current Node 24 releases. Local checks passing do not imply that remote CI has run.
+Acceptance tests start isolated API processes with disposable SQLite databases and exercise Chromium desktop and mobile layouts. They cover creating employees, timer reload/start–stop–start, completed history, employee/date filters, empty reports, failed saves, and recovery after a lost start response. Axe checks the rendered UI for selected WCAG A/AA rules. API tests additionally cover a **real server restart**, concurrent starts, idempotent stops, boundary clipping, and daylight-saving changes. Automated accessibility checks do not replace a full accessibility audit.
 
-### Timers and reports
+[CI](https://github.com/dias-btt/falconai-test/actions/workflows/ci.yml) runs on PRs and pushes to `main`, testing the minimum and current Node 24 releases and the browser suite. [Validation evidence](docs/VALIDATION.md) records the checks actually run and their limits.
 
-Select an employee with **Track time**. Names may repeat; the numbered employee list distinguishes records. Task descriptions accept 1–500 characters after trimming. Only one timer can run per employee, while different employees can track time simultaneously. A stopped timer stays in history; starting again creates a new entry. Reloading or restarting the server does not reset a running timer. Repeated stop requests preserve the original stop time.
+## Design decisions
 
-Reports default to today in the browser's displayed timezone. **From** and **Through** are inclusive calendar dates. Press **View report** to apply them. Completed entries contribute only the portion within the selected period; running timers are shown separately and excluded from totals. Empty reports show zero. Totals use `HH:MM:SS` and do not wrap at 24 hours.
+- **Small stack:** React/Vite + strict TypeScript, Express, and Node's built-in SQLite. No ORM, remote database, AI API key, or cloud service is needed to run it.
+- **Durable timers:** the server supplies UTC millisecond timestamps. SQLite holds the start time until explicitly stopped, so downtime counts toward a running timer. A database index and atomic insert enforce one active timer per employee. Repeated stops keep their original timestamp; restarting creates a new entry.
+- **Clear reports:** inclusive local calendar dates become the UTC interval `[from, to)`. Completed records contribute only their overlap with that interval. Active timers appear separately and do not inflate completed totals. Calculations retain milliseconds; display uses `HH:MM:SS`, including totals above 24 hours.
+- **Validation and recovery:** names accept 1–100 characters and tasks 1–500 after trimming. Duplicate names are allowed and identified by separate records. Failed writes do not automatically retry; refresh confirms server state first. The UI discards obsolete employee/report responses.
+- **Testable boundaries:** HTTP construction is separate from process startup; tests inject a database and clock. Migrations are transactional and reject unsupported future schemas without replacing data.
+
+```text
+src/client/         React interface and API clients
+src/server/         HTTP routes, SQLite migrations, startup, seed command
+src/shared/         Validation, API types, calendar and duration helpers
+tests/              Unit, API, persistence, and process-restart tests
+tests/e2e/          Isolated browser fixtures and acceptance tests
+docs/               Work log, plan, validation record, screenshots
+.github/            CI and PR template
+```
 
 | API | Result |
 | --- | --- |
 | `GET /api/employees` | Employee list |
 | `POST /api/employees` with `{ "name": "Alex Example" }` | New employee, HTTP 201 |
 | `GET /api/employees/:id/timer` | Active entry or null, plus server time |
-| `POST /api/employees/:id/timer/start` with `{ "description": "Fictional task" }` | New running entry, HTTP 201; conflict is 409 |
+| `POST /api/employees/:id/timer/start` with `{ "description": "Fictional task" }` | Running entry, HTTP 201; already running is 409 |
 | `POST /api/time-entries/:id/stop` | Stopped entry; safe to repeat |
-| `GET /api/employees/:id/report?from=...&to=...` | Completed entries with `durationMs` and `totalMs`; bounds are UTC milliseconds, `[from, to)` |
+| `GET /api/employees/:id/report?from=...&to=...` | Completed records, `durationMs`, `totalMs`; UTC millisecond bounds |
 
-### Structure and persistence
+## AI use and human review
 
-```text
-src/client/         React app and styles
-src/server/         HTTP API, timers, reports, SQLite migrations, seed command
-src/shared/         Shared validation, API types, time/date utilities
-tests/              Vitest database, API, and configuration tests
-docs/               Delivery plan and AI work log
-.github/            CI workflow and PR template
-```
+**Tool:** OpenAI Codex desktop. **Model:** GPT-6 Astra, confirmed by the author from the chat's model selection. AI produced planning, implementation, tests, and documentation. The author supplied the requirements, chose the staged workflow, and committed and merged the work through GitHub PRs. No AI integration is embedded in the application.
 
-The HTTP app accepts a database connection, making it testable without starting the production entry point. SQLite migration 1 creates employees and time entries, foreign keys, duration checks, and a unique partial index enforcing one active timer per employee. Pending migrations run within a transaction; a database from a newer app version is rejected instead of being overwritten. Future schema changes append migrations in `src/server/database.ts`.
+Actual request excerpts from the development chat:
 
-### Known limitations
+1. “Create from scratch a small web application for tracking employees' working time in a company.” The supplied assignment also required persistence, timer-restart tests, and an empty report.
+2. “it should be strong, with clear work shown on github (PR, branches, commits etc) … you write me a plan, execute first step” — established the incremental delivery plan.
+3. “do steps 4 and 5 together. tokens are limited, so make sure you dont waste them on unnecessary checks” — combined timers and reporting with focused verification.
+4. “now do 6 and 7 step” — added acceptance coverage and prepared the submission.
 
-- The interface does not poll for changes made in another browser; use **Refresh** to synchronize. There is no authentication, employee editing/deletion, or export. Automated browser acceptance coverage remains a later step.
-- `node:sqlite` is experimental in the minimum supported runtime; the application is intentionally scoped to Node 24.
-- The foundation audit found zero production vulnerabilities. The full audit reports 12 moderate findings propagated from a development-only [minimatch advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249) in the lint toolchain. The supported lint packages still request an affected major version. Recheck upstream fixes before submission; no forced downgrade or cross-major override has been applied.
+The [AI work log](docs/AI_WORK_LOG.md) distinguishes actual requests, proposed example prompts, generated changes, failures, and verification. Generated code was checked with automated tests, type checking, lint, and browser inspection rather than accepted solely because it ran once.
 
-## AI tools, prompts, and code review
+**Confirmed errors found and fixed:**
 
-Development uses **OpenAI Codex in the desktop app** for planning, implementation, review, and testing. The exact model identifier has not been verified and must be recorded from the session's visible model configuration before submission.
+- **HTTP status:** the first error handler changed oversized JSON requests into HTTP 500. A regression test reproduced `expected 413, got 500`; handling the parser's `entity.too.large` error now returns HTTP 413. The test remains in `tests/app.test.ts`.
+- **Contrast:** browser acceptance found muted text and the selected employee hover state below contrast requirements. Darkened the text and fixed the selected hover style.
+- **Keyboard access:** the overflowing mobile report table could not receive keyboard focus. Added a labeled focusable region and visible focus ring.
 
-The [AI work log](docs/AI_WORK_LOG.md) records actual requests, decisions, validation, and defects. Example prompts below are intended for later development; they have **not** been executed:
+The latter two fixes are covered by browser accessibility/focus checks. [Validation evidence](docs/VALIDATION.md) records the initial failures and successful reruns. Test-code lint/type errors were recorded separately from application defects.
 
-1. “Implement employee creation with server validation and SQLite persistence. Test blank names and persistence using a temporary database. Explain the schema choices.”
-2. “Implement start and stop operations with one active timer per employee. Test start → stop → start, duplicate starts, and recovery after restarting the server. Use a controllable clock.”
-3. “Review reporting for date-boundary errors. Test an empty report and entries overlapping either edge of the selected period. Show a failing regression test before fixing any confirmed defect.”
+## GitHub delivery history
 
-**Error found and fixed in the foundation:** the initial error handler converted an oversized JSON request into `500 Internal Server Error`. A regression test reproduced the failure (20 passed, 1 failed); handling the parser's `entity.too.large` error now returns `413` with a clear message, and all 21 tests pass. See [the work log](docs/AI_WORK_LOG.md) and `tests/app.test.ts` for evidence. The foundation was merged in [PR #1](https://github.com/dias-btt/falconai-test/pull/1); employee management in [PR #2](https://github.com/dias-btt/falconai-test/pull/2).
+| PR | Scope |
+| --- | --- |
+| [#1](https://github.com/dias-btt/falconai-test/pull/1) | TypeScript foundation, SQLite schema, tests, CI |
+| [#2](https://github.com/dias-btt/falconai-test/pull/2) | Employee creation, validation, persistence, seed data |
+| [#3](https://github.com/dias-btt/falconai-test/pull/3) | Timers, reports, restart and date-boundary tests |
 
-## Repository workflow
+Acceptance and submission work is on `feat/submission` until its final PR is merged. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [delivery plan](docs/IMPLEMENTATION_PLAN.md). The public repository is the required deliverable; a hosted demo is optional and is not provided.
 
-Each implementation stage uses a focused branch and a reviewable pull request. Tests accompany the behavior they verify. See [CONTRIBUTING.md](CONTRIBUTING.md) for commit and PR conventions.
+## Limits
 
-Use only fictional employee and task data. A SQLite database and local environment files must never be committed. Authentication, payroll, billing, and deployment infrastructure are outside this assignment's scope.
+- Explicit **Refresh** synchronizes changes from another browser; there is no polling, authentication, employee editing/deletion, payroll, or export.
+- SQLite and its synchronous driver suit this small local application; this is not a multi-instance hosted deployment design.
+- Browser automation covers Chromium desktop/mobile, not all browser engines.
+- The latest recorded production dependency audit has zero findings. The development lint toolchain still has the documented [minimatch advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249); see the validation record. No forced incompatible dependency override has been applied.

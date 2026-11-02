@@ -136,7 +136,7 @@ export function TimeWorkspace({ employee }: { employee: Employee }) {
           <div className="report-total"><span>Total completed time</span><strong>{formatDuration(report.totalMs)}</strong></div>
           <p className="field-hint">Showing {new Date(report.from).toLocaleDateString()} – {new Date(report.to - 1).toLocaleDateString()}</p>
           {report.entries.length === 0 ? <p className="empty-report" role="status">No completed time entries in this period.</p>
-            : <div className="table-scroll"><table>
+            : <div className="table-scroll" role="region" aria-label="Completed time entries" tabIndex={0}><table>
               <caption className="sr-only">Completed time entries for {employee.name}</caption>
               <thead><tr><th scope="col">Task</th><th scope="col">Started</th><th scope="col">Stopped</th><th scope="col">Time in period</th></tr></thead>
               <tbody>{report.entries.map(entry => <tr key={entry.id}>
