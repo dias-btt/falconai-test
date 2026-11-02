@@ -1,5 +1,7 @@
 # Implementation plan
 
+All seven implementation stages are complete locally. The final acceptance/submission PR still needs author publication, green remote CI, and merge. See [validation evidence](VALIDATION.md).
+
 ## Delivery approach
 
 Build a complete, small application in independently reviewable stages. The user controls when each new stage starts. Complete only the current stage, report the changes and checks, and hand off the Git checkpoint before continuing.
@@ -15,8 +17,8 @@ The initial documentation checkpoint belongs on `main`. Subsequent branches star
 | 3 | `feat/employees` | Create and list employees, validation, fictional seed data, empty/loading/error UI states | API persistence and validation tests; browser smoke check |
 | 4 | `feat/reports` (combined) | Start/stop controls, task description, active timer recovery, duplicate-operation handling | Deterministic timer tests and actual API-process restart test |
 | 5 | `feat/reports` (combined) | Employee and date filters, completed records, totals, empty state | Range-overlap and empty-report tests; UI verification |
-| 6 | `codex/test/acceptance` | End-to-end workflows, clean-install check, accessibility and error-state review | Browser tests plus restart/persistence checks on a temporary database |
-| 7 | `codex/docs/submission` | Verified README, screenshots, architecture explanation, actual AI/debugging evidence, public repository readiness | Run documented commands from a clean checkout; all CI checks green |
+| 6 | `feat/submission` (combined) | End-to-end workflows, clean-install check, accessibility and error-state review | Browser tests plus restart/persistence checks on a temporary database |
+| 7 | `feat/submission` (combined) | Verified README, screenshots, architecture explanation, actual AI/debugging evidence, public repository readiness | Run documented commands from a clean checkout; all CI checks green |
 
 If review reveals a defect, use a descriptive `codex/fix/<issue>` branch with a regression test and focused PR. Do not create a fix branch merely to populate the history. An optional demo comes after the required deliverables.
 

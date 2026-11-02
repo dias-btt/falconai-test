@@ -5,7 +5,7 @@ Keep this log factual. Distinguish prompts actually used from suggestions, propo
 ## Tools and model attribution
 
 - Tool: OpenAI Codex desktop app.
-- Exact model: not yet verified from the session's visible model configuration. Record it before submission; do not guess a specific model/version from the app name.
+- Model: **GPT-6 Astra**, confirmed by the user during the submission step. Earlier entries preserve the attribution uncertainty that existed at the time.
 - Contributions so far: repository inspection, implementation planning, foundation code and tests, code review, local validation, and documentation.
 - Human contribution so far: supplied the assignment, requested a staged branch/PR workflow, published the initial documentation, selected `chore/foundation`, and retained control of stage transitions.
 
@@ -111,6 +111,34 @@ The workspace was clean on the user-created `feat/reports` branch, based on merg
 ### Handoff
 
 README now documents employee setup/seeding, timers, report rules, and API endpoints. Model identity remains unverified. Existing development-only dependency findings were not re-audited because dependencies did not change. No commits, pushes, or PRs were created by the assistant for this combined stage; remote CI has not run for these changes. Steps 6 and 7 remain: browser acceptance hardening and submission polish.
+
+## 2026-11-02 — Steps 6 and 7: acceptance and submission
+
+### Actual requests and attribution
+
+> now do 6 and 7 step
+
+When asked for the displayed model, the user answered **“GPT-6 Astra”**. Updated the current README and tool attribution; older entries retain the uncertainty that existed before that confirmation.
+
+### Changes
+
+Worked on the clean user-created `feat/submission` branch after timer/report PR #3 merged. Added Playwright desktop/mobile acceptance tests, an axe accessibility check, isolated production-server fixtures, a browser CI job, and `npm run verify`. Each browser case owns a temporary database and server. Added screenshots, a reviewer-oriented README, public PR history, and a validation record. Followed the user's request to keep checks focused: targeted the failed browser cases after fixes, then performed one full clean-copy verification.
+
+### Real findings and fixes
+
+The initial browser run had **6 passed, 2 failed**. Workflow and failure-recovery cases passed. The desktop and mobile accessibility cases exposed insufficient contrast in muted text and the selected employee button's hover state. The mobile case also found a report scroller without keyboard focus. Darkened the affected colors, preserved a dark selected hover background, and gave the report scroller a label, keyboard focus, and visible focus ring. Added an explicit focus assertion. Both failed cases then passed; these were application defects, not hypothetical risks or manufactured debugging examples.
+
+### Final evidence
+
+- Clean source copy without dependencies, build output, local database, or `.env`: `npm ci`, `npx playwright install chromium`, and `npm run verify` passed.
+- **63 unit/integration tests and 8 browser cases** passed; lint, type checking, and production build passed.
+- The browser suite covers timer reload/restart, report selection and empty results, employee creation, failed requests, and recovery when the server saves a timer but its response is lost. The existing process-restart test checks durable employees and time entries.
+- The optional seed added 3 records on its first run and 0 on its second.
+- Saved and visually inspected screenshots from passing desktop/mobile tests. Screenshot records are explicitly fictional fixtures.
+- Production dependency audit returned zero findings; full installation still reported 12 moderate findings from the previously documented development-only advisory.
+- GitHub confirmed the repository is public, PR #3 merged, and its Node 24.2.0/current-24 CI jobs passed. The new browser CI job has not run remotely because this branch has not been pushed by the assistant.
+
+See [VALIDATION.md](VALIDATION.md) for commands, limitations, and the distinction between the tested source copy and published Git history. The final handoff preserves the user's control over commits, pushes, and merging. No job application was submitted and no demo was deployed.
 
 ## Future entry format
 
