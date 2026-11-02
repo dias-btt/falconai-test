@@ -5,9 +5,9 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": ["node"],
-    "rootDir": "src/server",
-    "outDir": "dist/server",
+    "rootDir": "src",
+    "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/server"]
+  "include": ["src/server", "src/shared"]
 }
