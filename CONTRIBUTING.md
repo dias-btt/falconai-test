@@ -4,7 +4,7 @@
 
 Follow [the implementation plan](docs/IMPLEMENTATION_PLAN.md). Finish the current stage and its checks before starting another. The user decides when to move to the next branch.
 
-For the first checkpoint, commit the planning files on `main`. The repository already points to `main`; its first commit will establish the branch. Configure the public GitHub remote when available.
+The initial documentation checkpoint is on `main`. The foundation is developed on the user-created `chore/foundation` branch. Preserve the user's selected branch names; the later names in the plan are suggestions.
 
 For each subsequent stage:
 
@@ -37,4 +37,4 @@ The examples describe potential work, not existing commits. Only use `fix` when 
 - Update the README when setup or behavior changes; update the AI log with actual evidence.
 - Keep all employee/task examples fictional and exclude local data and secrets from Git.
 
-The application commands and CI requirements will be introduced with the foundation PR. Until then, documentation review is the only applicable validation.
+Run `npm ci` to install the lockfile and `npm run check` before opening a PR. This runs lint, tests, type checking, and a production build. Use `npm run dev` for browser verification. CI repeats the checks on the minimum supported and current Node 24 releases. Report local results separately from remote CI results.
