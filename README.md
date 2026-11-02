@@ -2,7 +2,7 @@
 
 A small employee time tracker for the Falcon AI programmer assignment.
 
-**Status:** foundation implemented. The app runs locally with a connected workspace shell, HTTP API, SQLite schema, automated tests, and CI configuration. Employee controls, timers, and reports are upcoming stages; this is not yet the completed assignment.
+**Status:** employees, task timers, and date-range reports are implemented. SQLite persists employees, completed entries, and active timers across server restarts. Automated acceptance hardening and final submission polish remain.
 
 ## Scope
 
@@ -31,9 +31,9 @@ npm ci
 npm run dev
 ```
 
-Until the foundation PR is merged, check out `chore/foundation` before installing. Open [the development app](http://127.0.0.1:5173). Vite proxies `/api` to the Node server at port 3001. Both processes restart or refresh when their source changes; Ctrl+C stops both. The shell should display **Workspace connected**.
+Open [the development app](http://127.0.0.1:5173). Vite proxies `/api` to the Node server at port 3001. Both processes restart or refresh when their source changes; Ctrl+C stops both. Add an employee, select **Track time**, enter a task description, and start the timer. Stop it to include its time in the report below.
 
-The server creates `data/shiftledger.sqlite` and applies pending migrations automatically at startup. Restarting uses the same file without clearing data. There is no separate database initialization command and no seed data yet.
+The server creates `data/shiftledger.sqlite` and applies pending migrations automatically at startup. Restarting uses the same file without clearing data. No separate initialization command is needed. Optionally run `npm run db:seed` to add three fictional employees; repeated runs preserve existing records and do not duplicate the samples.
 
 ### Configuration
 
@@ -66,15 +66,31 @@ npm run check
 
 This runs lint, all tests, type checking, and the production build. Individual commands are `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:watch`, and `npm run build`.
 
-The 21 foundation tests cover configuration validation, SQLite initialization and reopening, foreign keys, timer constraints, newer-schema rejection, health responses, JSON errors, and static file serving. Tests use in-memory or temporary databases and do not modify your local data. Timer operations and empty-report tests will arrive alongside those features.
+The 63 tests cover employee validation and persistence, repeatable seeding, timer start–stop–start, concurrent starts, idempotent stops, real API-process restart recovery, empty reports, clipped date boundaries, daylight-saving changes, configuration, and HTTP errors. Tests use temporary databases and do not modify your local data.
 
 [GitHub Actions](.github/workflows/ci.yml) runs `npm ci` and `npm run check` for PRs and pushes to `main`, on the minimum and current Node 24 releases. Local checks passing do not imply that remote CI has run.
+
+### Timers and reports
+
+Select an employee with **Track time**. Names may repeat; the numbered employee list distinguishes records. Task descriptions accept 1–500 characters after trimming. Only one timer can run per employee, while different employees can track time simultaneously. A stopped timer stays in history; starting again creates a new entry. Reloading or restarting the server does not reset a running timer. Repeated stop requests preserve the original stop time.
+
+Reports default to today in the browser's displayed timezone. **From** and **Through** are inclusive calendar dates. Press **View report** to apply them. Completed entries contribute only the portion within the selected period; running timers are shown separately and excluded from totals. Empty reports show zero. Totals use `HH:MM:SS` and do not wrap at 24 hours.
+
+| API | Result |
+| --- | --- |
+| `GET /api/employees` | Employee list |
+| `POST /api/employees` with `{ "name": "Alex Example" }` | New employee, HTTP 201 |
+| `GET /api/employees/:id/timer` | Active entry or null, plus server time |
+| `POST /api/employees/:id/timer/start` with `{ "description": "Fictional task" }` | New running entry, HTTP 201; conflict is 409 |
+| `POST /api/time-entries/:id/stop` | Stopped entry; safe to repeat |
+| `GET /api/employees/:id/report?from=...&to=...` | Completed entries with `durationMs` and `totalMs`; bounds are UTC milliseconds, `[from, to)` |
 
 ### Structure and persistence
 
 ```text
 src/client/         React app and styles
-src/server/         HTTP app, startup, configuration, SQLite migrations
+src/server/         HTTP API, timers, reports, SQLite migrations, seed command
+src/shared/         Shared validation, API types, time/date utilities
 tests/              Vitest database, API, and configuration tests
 docs/               Delivery plan and AI work log
 .github/            CI workflow and PR template
@@ -84,7 +100,7 @@ The HTTP app accepts a database connection, making it testable without starting 
 
 ### Known limitations
 
-- Employee, timer, and report endpoints and controls are not implemented yet.
+- The interface does not poll for changes made in another browser; use **Refresh** to synchronize. There is no authentication, employee editing/deletion, or export. Automated browser acceptance coverage remains a later step.
 - `node:sqlite` is experimental in the minimum supported runtime; the application is intentionally scoped to Node 24.
 - The foundation audit found zero production vulnerabilities. The full audit reports 12 moderate findings propagated from a development-only [minimatch advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249) in the lint toolchain. The supported lint packages still request an affected major version. Recheck upstream fixes before submission; no forced downgrade or cross-major override has been applied.
 
@@ -98,7 +114,7 @@ The [AI work log](docs/AI_WORK_LOG.md) records actual requests, decisions, valid
 2. “Implement start and stop operations with one active timer per employee. Test start → stop → start, duplicate starts, and recovery after restarting the server. Use a controllable clock.”
 3. “Review reporting for date-boundary errors. Test an empty report and entries overlapping either edge of the selected period. Show a failing regression test before fixing any confirmed defect.”
 
-**Error found and fixed in the foundation:** the initial error handler converted an oversized JSON request into `500 Internal Server Error`. A regression test reproduced the failure (20 passed, 1 failed); handling the parser's `entity.too.large` error now returns `413` with a clear message, and all 21 tests pass. See [the work log](docs/AI_WORK_LOG.md) and `tests/app.test.ts` for evidence. No commit or PR link is claimed until this branch is committed and published.
+**Error found and fixed in the foundation:** the initial error handler converted an oversized JSON request into `500 Internal Server Error`. A regression test reproduced the failure (20 passed, 1 failed); handling the parser's `entity.too.large` error now returns `413` with a clear message, and all 21 tests pass. See [the work log](docs/AI_WORK_LOG.md) and `tests/app.test.ts` for evidence. The foundation was merged in [PR #1](https://github.com/dias-btt/falconai-test/pull/1); employee management in [PR #2](https://github.com/dias-btt/falconai-test/pull/2).
 
 ## Repository workflow
 

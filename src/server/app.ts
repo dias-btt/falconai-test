@@ -5,8 +5,9 @@ import express from 'express';
 import type { ErrorRequestHandler } from 'express';
 import { schemaVersion } from './database.js';
 import { employeeRoutes } from './employees.js';
+import { timeTrackingRoutes } from './time-tracking.js';
 
-export function createApp(db: DatabaseSync, clientDirectory?: string) {
+export function createApp(db: DatabaseSync, clientDirectory?: string, now: () => number = Date.now) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '16kb' }));
@@ -17,6 +18,7 @@ export function createApp(db: DatabaseSync, clientDirectory?: string) {
   });
 
   app.use('/api/employees', employeeRoutes(db));
+  app.use('/api', timeTrackingRoutes(db, now));
 
   app.use('/api', (_request, response) => {
     response.status(404).json({ error: 'API endpoint not found.' });

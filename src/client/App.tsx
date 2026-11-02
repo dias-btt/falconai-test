@@ -12,9 +12,8 @@ export function App() {
       <main>
         <p className="eyebrow">YOUR TEAM’S WORKDAY</p>
         <h1>Good work starts <span>with people.</span></h1>
-        <p className="intro">Build your team’s workspace, one person at a time.</p>
+        <p className="intro">Your team, their tasks, and the time behind the work.</p>
         <EmployeeWorkspace />
-        <p className="coming-next">Up next: task timers and time reports for every employee.</p>
       </main>
       <footer>ShiftLedger <span>Built for a more considered workday.</span></footer>
     </div>

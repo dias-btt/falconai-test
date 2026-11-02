@@ -12,9 +12,9 @@ The initial documentation checkpoint belongs on `main`. Subsequent branches star
 | --- | --- | --- | --- |
 | 1 | `main` | Assignment brief, scope, acceptance criteria, workflow, AI log | Documentation cross-check; no runtime claims |
 | 2 | `chore/foundation` | TypeScript client/API structure, SQLite initialization and migrations, lint/typecheck/test/build scripts, CI, runnable shell | Fresh setup works; database can reopen; automated checks pass |
-| 3 | `codex/feat/employees` | Create and list employees, validation, fictional seed data, empty/loading/error UI states | API persistence and validation tests; browser smoke check |
-| 4 | `codex/feat/timers` | Start/stop controls, task description, active timer recovery, duplicate-operation handling | Deterministic timer tests and actual API-process restart test |
-| 5 | `codex/feat/reports` | Employee and date filters, completed records, totals, empty state | Range-overlap and empty-report tests; UI verification |
+| 3 | `feat/employees` | Create and list employees, validation, fictional seed data, empty/loading/error UI states | API persistence and validation tests; browser smoke check |
+| 4 | `feat/reports` (combined) | Start/stop controls, task description, active timer recovery, duplicate-operation handling | Deterministic timer tests and actual API-process restart test |
+| 5 | `feat/reports` (combined) | Employee and date filters, completed records, totals, empty state | Range-overlap and empty-report tests; UI verification |
 | 6 | `codex/test/acceptance` | End-to-end workflows, clean-install check, accessibility and error-state review | Browser tests plus restart/persistence checks on a temporary database |
 | 7 | `codex/docs/submission` | Verified README, screenshots, architecture explanation, actual AI/debugging evidence, public repository readiness | Run documented commands from a clean checkout; all CI checks green |
 
