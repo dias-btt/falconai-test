@@ -4,6 +4,7 @@ import type { DatabaseSync } from 'node:sqlite';
 import express from 'express';
 import type { ErrorRequestHandler } from 'express';
 import { schemaVersion } from './database.js';
+import { employeeRoutes } from './employees.js';
 
 export function createApp(db: DatabaseSync, clientDirectory?: string) {
   const app = express();
@@ -14,6 +15,8 @@ export function createApp(db: DatabaseSync, clientDirectory?: string) {
     db.prepare('SELECT 1').get();
     response.set('Cache-Control', 'no-store').json({ status: 'ok', database: 'ok', schemaVersion: schemaVersion(db) });
   });
+
+  app.use('/api/employees', employeeRoutes(db));
 
   app.use('/api', (_request, response) => {
     response.status(404).json({ error: 'API endpoint not found.' });

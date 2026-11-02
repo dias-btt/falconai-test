@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "build": "npm run typecheck && vite build && tsc -p tsconfig.server.json",
     "start": "node --env-file-if-exists=.env dist/server/index.js",
+    "db:seed": "node --env-file-if-exists=.env --import tsx src/server/seed.ts",
     "check": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
